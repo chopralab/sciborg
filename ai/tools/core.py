@@ -8,7 +8,7 @@ from langchain.pydantic_v1 import root_validator
 from langchain.pydantic_v1 import ValidationError as ValidationErrorV1
 from langchain_core.tools import create_schema_from_function, ToolException
 
-from ASPIRE_LINQX.core.command.base import BaseDriverCommand
+from sciborg.core.command.base import BaseDriverCommand
 
 class LinqxTool(BaseTool):
     '''

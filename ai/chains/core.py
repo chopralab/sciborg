@@ -15,9 +15,9 @@ from langchain_core.memory import BaseMemory
 
 from langchain_openai import ChatOpenAI
 
-from ASPIRE_LINQX.ai.schema.parameter import ParameterSchemaV1
-from ASPIRE_LINQX.ai.schema.command import LibraryCommandSchemaV1
-from ASPIRE_LINQX.ai.schema.workflow import RunWorkflowSchemaV1
+from sciborg.ai.schema.parameter import ParameterSchemaV1
+from sciborg.ai.schema.command import LibraryCommandSchemaV1
+from sciborg.ai.schema.workflow import RunWorkflowSchemaV1
 
 class LinqxLLMChain(LLMChain):
     '''

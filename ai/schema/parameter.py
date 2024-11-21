@@ -1,7 +1,7 @@
 from langchain.pydantic_v1 import BaseModel, PositiveInt, root_validator, Field
 from typing import Literal, List, Dict, Any
 
-from ASPIRE_LINQX.core.parameter.base import ParameterModel, ValueType
+from sciborg.core.parameter.base import ParameterModel, ValueType
 
 class ParameterModelSchemaV1(BaseModel):
     # Parameter model attributes

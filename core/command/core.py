@@ -8,8 +8,8 @@ from typing import (
     Optional,
     Callable,
 )
-from ASPIRE_LINQX.core.parameter.base import Parameter
-from ASPIRE_LINQX.core.command.base import BaseDriverCommand
+from sciborg.core.parameter.base import Parameter
+from sciborg.core.command.base import BaseDriverCommand
 
 class InteractiveParameterDriverCommand(BaseDriverCommand):
     '''

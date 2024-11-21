@@ -6,9 +6,9 @@ import json
 from langchain_core.language_models import BaseLanguageModel
 from langchain.pydantic_v1 import BaseModel as BaseModelV1
 from uuid import UUID, uuid4
-from ASPIRE_LINQX.core.command.base import BaseDriverCommand, BaseInfoCommand
-from ASPIRE_LINQX.core.library.base import BaseDriverMicroservice
-from ASPIRE_LINQX.ai.chains.core import create_linqx_command_parser
+from sciborg.core.command.base import BaseDriverCommand, BaseInfoCommand
+from sciborg.core.library.base import BaseDriverMicroservice
+from sciborg.ai.chains.core import create_linqx_command_parser
 
 def function_to_driver_command(
     func: FunctionType,

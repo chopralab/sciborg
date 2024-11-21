@@ -3,11 +3,11 @@ from typing import Dict, Type, Any, Union
 import json
 from uuid import UUID
 
-from ASPIRE_LINQX.ai.schema.parameter import(
+from sciborg.ai.schema.parameter import(
     ParameterSchemaV1,
     ParameterModelSchemaV1,
 )
-from ASPIRE_LINQX.core.command.base import BaseInfoCommand
+from sciborg.core.command.base import BaseInfoCommand
 
 class LibraryCommandSchemaV1(BaseModel):
 

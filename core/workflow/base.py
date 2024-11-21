@@ -8,7 +8,7 @@ from typing import (
     SupportsIndex,
     Iterator,
 )
-from ASPIRE_LINQX.core.command.base import (
+from sciborg.core.command.base import (
     BaseCommand,
     BaseInfoCommand, 
     BaseRunCommand, 

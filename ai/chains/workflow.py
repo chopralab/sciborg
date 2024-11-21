@@ -16,11 +16,11 @@ from langchain_openai import ChatOpenAI
 
 from typing import Type
 
-from ASPIRE_LINQX.core.library.base import BaseCommandLibrary
+from sciborg.core.library.base import BaseCommandLibrary
 
-from ASPIRE_LINQX.ai.schema.command import BaseRunCommandSchemaV1
-from ASPIRE_LINQX.ai.schema.workflow import RunWorkflowSchemaV1
-from ASPIRE_LINQX.ai.prompts.workflow import (
+from sciborg.ai.schema.command import BaseRunCommandSchemaV1
+from sciborg.ai.schema.workflow import RunWorkflowSchemaV1
+from sciborg.ai.prompts.workflow import (
     BASE_WORKFLOW_CONSTRUCTION_PROMPT,
     BASE_WORKFLOW_PLANNING_PROMPT,
 )

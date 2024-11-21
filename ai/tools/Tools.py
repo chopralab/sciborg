@@ -28,15 +28,15 @@ import sys, os
 import json
 
 # Import LINQX infrastructure objects
-from ASPIRE_LINQX.models.parameter.base import ParameterModel
-from ASPIRE_LINQX.models.parameter.base import ValueType
-from ASPIRE_LINQX.models.scheduler.base import BaseScheduleTemplate
-from ASPIRE_LINQX.models.command.base import BaseDriverCommand
+from sciborg.models.parameter.base import ParameterModel
+from sciborg.models.parameter.base import ValueType
+from sciborg.models.scheduler.base import BaseScheduleTemplate
+from sciborg.models.command.base import BaseDriverCommand
 
 # Import internal V1 schema
-from ASPIRE_LINQX.llm_copilots.schema.parameter import ParameterSchemaV1
-from ASPIRE_LINQX.llm_copilots.schema.scheduler import ScheduleSchemaV1
-from ASPIRE_LINQX.llm_copilots.schema.apptainer import (
+from sciborg.llm_copilots.schema.parameter import ParameterSchemaV1
+from sciborg.llm_copilots.schema.scheduler import ScheduleSchemaV1
+from sciborg.llm_copilots.schema.apptainer import (
     ApptainerFilenameAppTemplateV1,
     ApptainerFilenameListTemplateV1,
     ApptainerFilenameTemplateV1,

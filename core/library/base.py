@@ -13,7 +13,7 @@ from types import ModuleType
 from uuid import UUID, uuid4
 from importlib import import_module
 import json
-from ASPIRE_LINQX.core.command.base import (
+from sciborg.core.command.base import (
     BaseCommand,
     BaseInfoCommand,
     BaseDriverCommand,

@@ -1,4 +1,4 @@
-from ASPIRE_LINQX.utils.benchmarking.base import BaseAgentBenchmarker
+from sciborg.utils.benchmarking.base import BaseAgentBenchmarker
 from typing import Dict, Type, Any, List
 from pydantic import BaseModel, PrivateAttr
 import re

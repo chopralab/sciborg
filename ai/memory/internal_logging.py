@@ -10,7 +10,7 @@ from langchain_core.language_models import BaseLanguageModel
 from typing import Dict, Any, List, Type
 import json
 
-from ASPIRE_LINQX.ai.prompts.memory import ACTION_SUMMARY_PROMPT, ACTION_LOG_FSA_TEMPLATE
+from sciborg.ai.prompts.memory import ACTION_SUMMARY_PROMPT, ACTION_LOG_FSA_TEMPLATE
 
 class CustomSummariserMixin(SummarizerMixin):
     """Mixin for summarizer."""

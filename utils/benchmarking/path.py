@@ -1,5 +1,5 @@
 from typing import Iterable, Tuple, List, Dict, Any, Type
-from ASPIRE_LINQX.utils.benchmarking.base import BaseAgentBenchmarker
+from sciborg.utils.benchmarking.base import BaseAgentBenchmarker
 
 from pydantic import BaseModel, InstanceOf, ValidationError, PrivateAttr
 

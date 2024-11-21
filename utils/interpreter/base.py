@@ -1,9 +1,9 @@
 from pydantic import BaseModel, ConfigDict, Field, validate_call, field_validator, InstanceOf
 from typing import List, Any, Dict
 
-from ASPIRE_LINQX.core.library.base import BaseDriverCommandLibrary
-from ASPIRE_LINQX.core.command.base import BaseRunCommand, BaseDriverCommand
-from ASPIRE_LINQX.core.workflow.base import BaseDriverWorkflow, BaseRunWorkflow
+from sciborg.core.library.base import BaseDriverCommandLibrary
+from sciborg.core.command.base import BaseRunCommand, BaseDriverCommand
+from sciborg.core.workflow.base import BaseDriverWorkflow, BaseRunWorkflow
 
 class BaseCommandInterpreter(BaseModel):
     '''

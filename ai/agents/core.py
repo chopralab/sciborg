@@ -16,19 +16,19 @@ from langchain.memory import ConversationBufferWindowMemory, ConversationSummary
 from langchain_openai import ChatOpenAI
 from langchain.agents import tool
 
-from ASPIRE_LINQX.core.library.base import BaseDriverMicroservice
-from ASPIRE_LINQX.core.command.base import BaseDriverCommand
-from ASPIRE_LINQX.ai.memory.internal_logging import CustomActionLogSummaryMemory, FSAMemory
-from ASPIRE_LINQX.ai.memory.embedding import EmbeddingSummaryMemory
-from ASPIRE_LINQX.ai.prompts.agent import (
+from sciborg.core.library.base import BaseDriverMicroservice
+from sciborg.core.command.base import BaseDriverCommand
+from sciborg.ai.memory.internal_logging import CustomActionLogSummaryMemory, FSAMemory
+from sciborg.ai.memory.embedding import EmbeddingSummaryMemory
+from sciborg.ai.prompts.agent import (
     HUMAN_TOOL_INSTRUCTIONS,
     ASSUME_DEFAULTS_INSTRUCTIONS,
     BASE_LINQX_CHAT_PROMPT_TEMPLATE,
     RAG_AS_A_TOOL_INSTRUCTIONS
 )
-from ASPIRE_LINQX.ai.tools.core import LinqxTool
-from ASPIRE_LINQX.ai.agents.rag_agent import rag_agent
-from ASPIRE_LINQX.ai.agents.pubchem_agent import pubchem_agent
+from sciborg.ai.tools.core import LinqxTool
+from sciborg.ai.agents.rag_agent import rag_agent
+from sciborg.ai.agents.pubchem_agent import pubchem_agent
 
 def command_to_tool(
     command: BaseDriverCommand,
