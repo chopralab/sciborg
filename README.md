@@ -34,7 +34,7 @@ pip install -r requirements.txt
 
 ### Testing the Installation
 Test the installation by running the following command:
-```bash
+```python
 import os
 os.environ['OPENAI_API_KEY'] = "<YOUR_API_KEY_HERE>"
 
@@ -82,7 +82,7 @@ sciborg/
 
 ### Making the microservice for the agents
 #### Microwave Synthesizer microservice
-```bash
+```python
 file_path = 'path_to_json/driver_MicroSynth.json'
 
 driver_command_microservice = module_to_microservice(MicrowaveSynthesizer)
@@ -91,7 +91,7 @@ with open(file_path, 'w') as outfile:
     outfile.write(driver_command_microservice.model_dump_json(indent=2))
 ```
 #### PubChem microservice
-```bash
+```python
 file_path = 'path_to_json/driver_pubchem.json'
 
 pubchem_command_microservice = module_to_microservice(PubChemCaller)
@@ -104,7 +104,7 @@ with open(file_path, 'w') as outfile:
 
 The RAG Agent (Retrieval-Augmented Generation) is used for answering scientific questions based on provided context. To use the RAG agent, run the following command:
 
-```bash
+```python
 rag_agent = create_linqx_chat_agent(
     microservice=driver_command_microservice,
     rag_vectordb_path = '<path>/embeddings/NIH_docs_embeddings',
@@ -115,7 +115,7 @@ rag_agent = create_linqx_chat_agent(
 ```
 
 ### Pubchem Agent
-```bash
+```python
 pubchem_agent = create_linqx_chat_agent(
     microservice=pubchem_command_microservice,
     llm=ChatOpenAI(model='gpt-4'),
@@ -125,7 +125,7 @@ pubchem_agent = create_linqx_chat_agent(
 ```
 
 ### PubChem and RAG Agent
-```bash
+```python
 pubchem_and_rag_agent = create_linqx_chat_agent(
     microservice=pubchem_command_microservice,
     rag_vectordb_path = '<path>/embeddings/NIH_docs_embeddings',
@@ -151,7 +151,7 @@ SciBORG includes benchmarking scripts to evaluate the performance of each agent.
 - Path Based Benchmarking
 - RegEx Based Benchmarking
 
-> For additional details on benchmarking and usage, refer to the `notebooks/SI/SI_benchmarks_01.ipynb`, `notebooks/SI/SI_benchmarks_02.ipynb` and `notebooks/SI/SI_benchmarks_03.ipynb` notebooks.
+For additional details on benchmarking and usage, refer to the `notebooks/SI/SI_benchmarks_01.ipynb`, `notebooks/SI/SI_benchmarks_02.ipynb` and `notebooks/SI/SI_benchmarks_03.ipynb` notebooks.
 Task: link the folder to the notebooks
 
 ## Additional Resources (adding soon...)
