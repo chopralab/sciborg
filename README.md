@@ -27,7 +27,7 @@ source sciborg-env/bin/activate
 ### Installation
 To install the SciBORG agent, clone the repository and install the dependencies using the following commands:
 ```shell
-git clone https://github.com/chopralab/SciBORG.git
+git clone https://github.com/chopralab/sciborg.git
 cd sciborg
 pip install -r requirements.txt
 ```
