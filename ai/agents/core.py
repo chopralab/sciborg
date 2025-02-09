@@ -58,7 +58,6 @@ def create_linqx_chat_agent(
         human_interaction: bool = True,
         assume_defaults: bool = False,
         rag_vectordb_path: str = None,
-        agent_description: str | None = None,
         agent_as_a_tool: AgentExecutor | None = None,
         agent_as_a_fsa: bool = False,
         fsa_object: Type[BaseModelV1] | None = None,
@@ -168,7 +167,7 @@ def create_linqx_chat_agent(
             This is the function that will query the relevant sources of information to get the answer to the question.
             There will be situations when you are not able to answer the question directly from the information you currently have. In such cases, you can search for the answer in the relevant sources of information.
             Often the user will also specify that you need to refer to "information" or "documents" to get the answer.
-            TAKSK: You have to frame the best possible "question" that is extremely descriptive and then use it as a parameter to query the relevant sources of information and return the citations if present.
+            TASK: You have to frame the best possible "question" that is extremely descriptive and then use it as a parameter to query the relevant sources of information and return the citations if present.
             """
             RAG_agent = rag_agent(question, rag_vectordb_path)
             store_output = RAG_agent.invoke({"question": question})
@@ -179,7 +178,9 @@ def create_linqx_chat_agent(
     if agent_as_a_tool is not None:
         @tool
         def call_provided_Agent(question: str) -> str:
-            f"""{agent_description}"""
+            """
+            Calls the provided agent with a question and returns its response.
+            """
             output = agent_as_a_tool.invoke({"input": question})
             return output['output']
         tools.append(call_provided_Agent)
