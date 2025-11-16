@@ -1,14 +1,15 @@
+from tqdm import tqdm
 from importlib import import_module
 from inspect import getmembers, isfunction, isclass, ismethod, signature, getdoc, getmodule, getsource
 from types import ModuleType, FunctionType
 from pydantic import BaseModel as BaseModelV2
 import json
 from langchain_core.language_models import BaseLanguageModel
-from langchain.pydantic_v1 import BaseModel as BaseModelV1
+# from langchain.pydantic_v1 import BaseModel as BaseModelV1
 from uuid import UUID, uuid4
 from sciborg.core.command.base import BaseDriverCommand, BaseInfoCommand
 from sciborg.core.library.base import BaseDriverMicroservice
-from sciborg.ai.chains.core import create_linqx_command_parser
+from sciborg.ai.chains.core import create_sciborg_command_parser
 
 def function_to_driver_command(
     func: FunctionType,
@@ -47,12 +48,20 @@ def function_to_driver_command(
     )
 
     # Use LLM to format
-    parser = create_linqx_command_parser(llm)
+    parser = create_sciborg_command_parser(llm)
     output = parser.invoke(query)
 
     print(output)
     # Build info command from this
-    info_command = BaseInfoCommand(**output['text'])
+    # info_command = BaseInfoCommand(**output['text'])
+    print(type(output))
+    # print(**output)
+    
+    # Normalize parameters: ensure None becomes empty dict
+    if output.get('parameters') is None:
+        output['parameters'] = {}
+    
+    info_command = BaseInfoCommand(**output)
 
     # Create and return driver command
     return BaseDriverCommand(
@@ -73,8 +82,8 @@ def module_to_microservice(
     uuid: str | UUID | None = None,
     llm: BaseLanguageModel | None = None,
 ) -> BaseDriverMicroservice:
-    '''
-    Converts a python module into a BaseDriverMicroservice
+    """
+    Converts a Python module into a BaseDriverMicroservice.
 
     Parameters
     ```
@@ -83,32 +92,35 @@ def module_to_microservice(
     microservice: str | None # The name of the microservice (defaults to module name)
     uuid: str | UUID | None # The UUID of the microservice
     ```
-    '''
-    # Import the module if needed
+    """
     if isinstance(module, str):
         module = import_module(module, package)
 
-    # If no name is provided, get the name of the module (minus pathing)
     if microservice is None:
         microservice = module.__name__.split('.')[-1]
-    
-    # If there is no UUID assigned, assign one
+
     if uuid is None:
         uuid = uuid4()
     elif isinstance(uuid, str):
         uuid = UUID(uuid)
 
-    # Create the driver command set from all functions in the module
-    # NOTE we cannot use just isfunction because it gets imports as well
-    driver_command_set = {
-        name : function_to_driver_command(func, microservice, uuid, llm)
-        for name, func in getmembers(
+    # Get all functions in the module and process them with a progress bar
+    functions = [
+        (name, func) for name, func in getmembers(
             module,
             lambda o: isfunction(o) and getmodule(o) == module and not o.__name__.startswith('_')
         )
-    }
+    ]
 
-    # Return the microservice
+    driver_command_set = {}
+    with tqdm(total=len(functions), desc="Processing functions", unit="function") as pbar:
+        for name, func in functions:
+            try:
+                driver_command_set[name] = function_to_driver_command(func, microservice, uuid, llm)
+            except Exception as e:
+                print(f"Error processing function {name}: {e}")
+            pbar.update(1)
+
     return BaseDriverMicroservice(
         name=microservice,
         uuid=uuid,
@@ -124,12 +136,10 @@ def object_to_microservice(
 ) -> BaseDriverMicroservice:
     '''
     Converts an object to a microservice.
+    Supports Pydantic v2 models (BaseModelV2).
     '''
-    if isinstance(object, BaseModelV2):
-        raise NotImplementedError("Version of Langchain used does not support Pydantic V2 schema, this will be updated!")
-    
-    if isinstance(object, BaseModelV1):
-        pass
+    # Pydantic v2 is now fully supported with LangChain v1.0+
+    # No need to raise an error for BaseModelV2 instances
 
     # If the microservice is none, set to object class name
     if microservice is None:

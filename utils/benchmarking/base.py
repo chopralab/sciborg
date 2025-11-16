@@ -1,9 +1,9 @@
 from typing import Dict, Any, Callable, List
 from pydantic import BaseModel, PrivateAttr, ConfigDict
-from langchain.agents import AgentExecutor
+from langchain_classic.agents import AgentExecutor
 
-from langchain.memory import CombinedMemory
-from langchain_core.memory import BaseMemory
+from langchain_classic.memory import CombinedMemory
+from langchain_classic.base_memory import BaseMemory
 from langchain_core.agents import AgentAction
 import json
 
@@ -178,9 +178,19 @@ class BaseAgentBenchmarker(BaseModel):
 
     def _compare_output(self, agent_output: Any, desired_output: Any) -> bool:
         '''
-        Compares selected agent output a desired output
+        Compares selected agent output to a desired output.
+        
+        This method must be implemented by subclasses to define
+        the comparison logic for their specific benchmarking needs.
+        
+        Args:
+            agent_output: The output from the agent
+            desired_output: The expected output to compare against
+            
+        Returns:
+            True if the outputs match, False otherwise
         '''
-        raise NotImplementedError
+        raise NotImplementedError("Subclasses must implement `_compare_output()` to define comparison logic.")
 
     def _validate_run(self, output: Dict[str, Any]) -> bool:
         '''
@@ -272,13 +282,16 @@ class BaseAgentBenchmarker(BaseModel):
 
         self._info_log(indent=2)
 
-    def async_bencmark(
+    def async_benchmark(
         self,
         iterations: int,
         initial_input: str | None = None,
         verbose: bool | None = None,
     )-> None:
         '''
-        Runs the benchmark asynchronously
+        Runs the benchmark asynchronously.
+        
+        Note: This method is not yet implemented. Use the synchronous
+        `benchmark()` method for now.
         '''
-        raise NotImplementedError
+        raise NotImplementedError("Async benchmarking is not yet implemented. Use `benchmark()` instead.")

@@ -1,4 +1,4 @@
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 ACTION_LOG_SUMMARY_TEMPLATE = """
 You will receive a list of python dictionaries representing an AI agents internal though/action/observation process.

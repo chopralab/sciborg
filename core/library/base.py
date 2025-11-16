@@ -120,8 +120,9 @@ class BaseCommandLibrary(BaseModel):
         return self.microservices.__getitem__(key)
     
     @model_validator(mode='after')
-    def validate_command_library(self) -> None:
+    def validate_command_library(self) -> 'BaseCommandLibrary':
         self._microservices = {str(microservice.uuid):microservice for microservice in self.microservices.values()}
+        return self
     
     def keys(self):
         return self.microservices.keys()

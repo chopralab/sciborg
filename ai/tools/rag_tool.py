@@ -1,16 +1,15 @@
 
 #TODO: This is a part of future refactoring when the rag tools is used for abstraction.
 
-from langchain.agents.format_scratchpad import format_to_openai_function_messages
-from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
-from langchain.agents import tool
-from langchain.chains import create_extraction_chain, RetrievalQA
+from langchain_classic.agents.format_scratchpad import format_to_openai_function_messages
+from langchain_classic.agents.output_parsers import OpenAIFunctionsAgentOutputParser
+from langchain_classic.agents import tool, AgentExecutor
+from langchain_classic.chains import create_extraction_chain, RetrievalQA
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.language_models import BaseLanguageModel
-from langchain.agents import AgentExecutor
 
 #?QUESTION Do we assume that the FAISS is used to make the embeddings? or do we need to switch this to a different vector store if required?
 @tool

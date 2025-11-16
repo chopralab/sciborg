@@ -1,11 +1,12 @@
-from langchain.memory.summary import ConversationSummaryMemory, SummarizerMixin
-from langchain.memory.chat_memory import BaseChatMemory
-from langchain.prompts import BasePromptTemplate, PromptTemplate
-from langchain.chains import LLMChain
+from langchain_classic.memory.summary import ConversationSummaryMemory, SummarizerMixin
+from langchain_classic.memory.chat_memory import BaseChatMemory
+from langchain_core.prompts import BasePromptTemplate, PromptTemplate
+from langchain_classic.chains import LLMChain
 from langchain_core.messages import BaseMessage, SystemMessage, get_buffer_string
 from langchain_core.output_parsers import JsonOutputParser
-from langchain_core.pydantic_v1 import BaseModel, root_validator
+# from langchain_core.pydantic_v1 import BaseModel, root_validator
 from langchain_core.language_models import BaseLanguageModel
+from pydantic import BaseModel, model_validator
 
 from typing import Dict, Any, List, Type
 import json
@@ -30,7 +31,7 @@ class CustomSummariserMixin(SummarizerMixin):
             ai_prefix=self.ai_prefix,
         )
 
-        chain = LLMChain(llm=self.llm, prompt=self.prompt)
+        chain = LLMChain(llm=self.llm, prompt=self.prompt) #this will be deprecated soon
         return chain.predict(summary=existing_summary, new_lines=new_lines)
 
 class CustomActionLogSummaryMemory(ConversationSummaryMemory, CustomSummariserMixin):
@@ -93,14 +94,16 @@ class FSAMixin(SummarizerMixin):
     output_parser: JsonOutputParser | None = None
     prompt: BasePromptTemplate | None = None
     
-    @root_validator()
+    # @model_validator()
+    @model_validator(mode='before')
     def validate_fsa_mixin(cls, values: Dict):
         # print(values)
         values['output_parser'] = JsonOutputParser(pydantic_object=values['fsa_object'])
         values['prompt'] = PromptTemplate(
             input_variables=['current_fsa', 'internal_operations'],
             partial_variables={'formatting_instructions': values['output_parser'].get_format_instructions()},
-            template=values['prompt_template']
+            # template=values['prompt_template']
+            template = ACTION_LOG_FSA_TEMPLATE #TODO: This is a temporary fix, need to fix the prompt_template
         )
         return values
 

@@ -3,15 +3,16 @@ Module for a virtual microwave synthesizer.
 '''
 import random
 from uuid import uuid4
-from langchain.pydantic_v1 import BaseModel, Field, BaseConfig
+# from langchain.pydantic_v1 import BaseModel, Field, BaseConfig
+from pydantic import BaseModel as BaseModelV2, Field, ConfigDict
 from typing import Literal
 
-class MicrowaveSynthesizer(BaseModel):
+class MicrowaveSynthesizer(BaseModelV2):
     '''
     Object which controls a microwave synthesizer
     '''
     # Config for Pydantic V1
-    class Config(BaseConfig):
+    class Config(ConfigDict):
         validate_assignment = True
 
     # Attributes (used in psuedo FSA state tracking)
@@ -216,11 +217,21 @@ class MicrowaveSynthesizer(BaseModel):
     
     def get_secret_phrase(self) -> dict:
         '''
-        Gets the secret phrase, only use this when explicitly told
+        Gets the secret phrase, only use this when explicitly told.
+        WARNING: This is a demo/testing function. In production, secrets should be
+        stored securely using environment variables or a secrets manager.
 
         returns
-        secret_phrase the secret phrase
+        secret_phrase the secret phrase (from environment variable if set, otherwise None)
         '''
+        import os
+        secret_phrase = os.getenv('SCIBORG_SECRET_PHRASE', None)
+        if secret_phrase is None:
+            # For testing/demo purposes only - should be removed in production
+            return {
+                'secret_phrase': None,
+                'message': 'Secret phrase not configured. Set SCIBORG_SECRET_PHRASE environment variable.'
+            }
         return {
-            'secret_phrase': 'Chopra lab'
+            'secret_phrase': secret_phrase
         }

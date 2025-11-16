@@ -107,11 +107,11 @@ class ParameterModel(BaseModel):
     '''
     Description
     -----------
-    This class is used to define a custom model for a parameter to be use in LINQX
+    This class is used to define a custom model for a parameter to be use in SCIBORG
     infrastructure components. After initilizing the model, use the to_param()
     method to create a class which represents the parameter that was defined.
     From there, individual objects of that parameter can be created and reference
-    in other LINQX infrastrucutre components.
+    in other SCIBORG infrastrucutre components.
 
     For example, to create a parameter called voltage which ranges between 60.0v and 240.0v
     and has a default value of 120.0v :

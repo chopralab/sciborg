@@ -7,16 +7,17 @@ from typing import (
     Type
 )
 # from langchain.agents.agent_toolkits import JsonToolkit
-from langchain.tools import StructuredTool, Tool, tool
-from langchain.tools.human.tool import HumanInputRun
-from langchain.tools.file_management import (
+from langchain_core.tools import StructuredTool, Tool, tool
+from langchain_community.tools import HumanInputRun
+from langchain_community.tools import (
     ReadFileTool,
     WriteFileTool,
     ListDirectoryTool
 )
-from langchain.tools.file_management.write import WriteFileInput
-from langchain.callbacks.manager import CallbackManagerForToolRun
-from langchain.pydantic_v1 import BaseModel, PositiveInt, Field
+from langchain_community.tools.file_management.write import WriteFileInput
+from langchain_core.callbacks.manager import CallbackManagerForToolRun
+# from langchain.pydantic_v1 import BaseModel, PositiveInt, Field
+from pydantic import BaseModel as BaseModelV2, Field, PositiveInt
 from langchain_community.agent_toolkits.base import BaseToolkit
 from langchain_community.tools import BaseTool
 
@@ -27,7 +28,7 @@ from spython.main import Client
 import sys, os
 import json
 
-# Import LINQX infrastructure objects
+# Import SCIBORG infrastructure objects
 from sciborg.models.parameter.base import ParameterModel
 from sciborg.models.parameter.base import ValueType
 from sciborg.models.scheduler.base import BaseScheduleTemplate
@@ -63,7 +64,7 @@ if not os.path.isdir(os.environ['LLM_MICROSERVICE_DIR']):
 # Custom Python Functions
 #######################################################
 
-# Custom functions for LINQX interaction
+# Custom functions for SCIBORG interaction
 @tool(args_schema=ParameterSchemaV1)
 def build_parameter_model_func(**kwargs) -> str:
     return ParameterModel(**kwargs).model_dump_json(indent=2, exclude_defaults=True)
@@ -139,7 +140,7 @@ def get_all_help(**kwargs) -> str:
 # Tool from Python Functions
 ##########################################################
 
-# Define custom LINQX infrastructure tools
+# Define custom SCIBORG infrastructure tools
 parameter_init_tool = StructuredTool.from_function(
     args_schema=ParameterModelV1,
     func=build_parameter_model_func,
@@ -249,7 +250,7 @@ class JSONWriteFileInput(WriteFileInput):
     text: str | Dict = Field(..., description='text to write to file')
 
 class JSONWriteFileTool(WriteFileTool):
-    args_schema: Type[BaseModel] = JSONWriteFileInput
+    args_schema: Type[BaseModelV2] = JSONWriteFileInput
     description: str = "Write JSON formatted file to disk"
 
     def _run(

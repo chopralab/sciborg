@@ -1,41 +1,79 @@
-from langchain.agents.format_scratchpad import format_to_openai_function_messages
-from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
-from langchain.agents import tool
-from langchain.chains import create_extraction_chain, RetrievalQA
+"""
+RAG (Retrieval Augmented Generation) Agent
+
+A specialized agent for answering questions using a vector database of documents.
+This agent retrieves relevant information from embeddings and provides answers with citations.
+"""
+
+from langchain_classic.agents.format_scratchpad import format_to_openai_function_messages
+from langchain_classic.agents.output_parsers import OpenAIFunctionsAgentOutputParser
+from langchain_classic.agents import tool, AgentExecutor
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.language_models import BaseLanguageModel
-from langchain.agents import AgentExecutor
+
 
 def rag_agent(
     question: str,
     path_to_embeddings: str,
-    llm: BaseLanguageModel = ChatOpenAI(temperature=0.1) #?QUESTION Is this a good default value?
-):
+    llm: BaseLanguageModel = ChatOpenAI(temperature=0.1)
+) -> AgentExecutor:
     """
-    Create a RAG chain with the tools.
+    Create a RAG (Retrieval Augmented Generation) agent.
+    
+    This agent can answer questions by retrieving relevant information from a vector
+    database of documents. It provides answers with citations (title and page numbers).
+    
+    Args:
+        question: The question to answer (used for initialization)
+        path_to_embeddings: Path to the FAISS vector database directory
+        llm: Language model to use (defaults to GPT-4 with temperature=0.1)
+        
+    Returns:
+        AgentExecutor: Configured agent ready to answer questions using RAG
+        
+    Note:
+        Currently assumes FAISS vector store. The embeddings are loaded using
+        OpenAIEmbeddings. To use a different vector store, modify this function.
+        
+    Example:
+        ```python
+        agent = rag_agent("What is the procedure?", "/path/to/embeddings")
+        result = agent.invoke({"question": "What is the procedure?"})
+        ```
     """
     embeddings = OpenAIEmbeddings()
-    # # #?QUESTION Do we assume that the FAISS is used to make the embeddings? or do we need to switch this to a different vector store if required?
-    db = FAISS.load_local(path_to_embeddings, embeddings, allow_dangerous_deserialization=True)
+    db = FAISS.load_local(
+        path_to_embeddings, 
+        embeddings, 
+        allow_dangerous_deserialization=True
+    )
     retriever = db.as_retriever()
 
     @tool
     def get_answer_from_information(situation: str) -> str:
         """
-        The user will provide a situation and the tool will return the answer from the information.
-        Provide a well formatted answer that is easy for the user to understand.
+        Retrieve relevant information from the document database.
+        
+        The user will provide a situation/question and the tool will return
+        relevant answers from the information with citations.
+        
+        Args:
+            situation: The question or situation to search for
+            
+        Returns:
+            List of answers with citations (title and page)
         """
         results = retriever.invoke(situation)
         answers = []
         for result in results:
-            answer = {}
-            # result.page_content, result.metadata['source'], result.metadata['page']
-            answer['citation_title'] = result.metadata['source']
-            answer['citation_page'] = result.metadata['page']
-            answer['answer'] = result.page_content
+            answer = {
+                'citation_title': result.metadata.get('source', 'Unknown'),
+                'citation_page': result.metadata.get('page', 'Unknown'),
+                'answer': result.page_content
+            }
             answers.append(answer)
         return answers
 
@@ -47,14 +85,18 @@ def rag_agent(
         [
             (
                 "system",
-                """You are very powerful assistant. 
-                You can answer questions about user query using relevant sources. You have to provide factual answers.
-                If requested to provide answer to the question you may use following steps:
+                """You are a powerful assistant with access to a document database.
+                
+                You can answer questions about user queries using relevant sources. 
+                You must provide factual answers based ONLY on the retrieved information.
+                
+                Process:
                     1. First use the tool to retrieve relevant information
                     2. Analyze the retrieved information carefully
-                    3. Provide a clear answer based ONLY on the retrieved information.
-                    4. Return the answer with respective citations (title and page) present in the retrieved information.
-                """, 
+                    3. Provide a clear answer based ONLY on the retrieved information
+                    4. Return the answer with respective citations (title and page) 
+                       present in the retrieved information
+                """,
             ),
             ("user", "{question}"),
             MessagesPlaceholder(variable_name="agent_scratchpad"),
@@ -65,8 +107,8 @@ def rag_agent(
         {
             "question": lambda x: x["question"],
             "agent_scratchpad": lambda x: format_to_openai_function_messages(
-            x["intermediate_steps"]
-        ),
+                x["intermediate_steps"]
+            ),
         }
         | prompt
         | llm_with_tools

@@ -2,7 +2,7 @@
 
 <img src="images/SciBORG Logo.png" alt="SciBORG Banner Image" width="" height="150">
 
-SciBORG is an innovative framework designed for building agents that can rapidly automate scientific discovery. It’s built to be modular, extensible, and easy to integrate with new components and agents, making it suitable for diverse research domains. 
+SciBORG is an innovative framework designed for building agents that can rapidly automate scientific discovery. It's built to be modular, extensible, and easy to integrate with new components and agents, making it suitable for diverse research domains. 
 
 This framework allows for smooth integration of various AI agents, each customizable to specific tasks, making it ideal for research labs, academic institutions, and organizations focusing on scientific discovery. By leveraging SciBORG, teams can automate complex workflows, empowering researchers to focus on innovative thinking and problem-solving.
 
@@ -18,7 +18,7 @@ Task:(some tracking tags go here)
 ## Quick Start Guide
 
 ### Pre-requisites
-For compatibility, it’s recommended to use a virtual environment with Python 3.10. Follow these steps to set it up:
+For compatibility, it's recommended to use a virtual environment with Python 3.10. Follow these steps to set it up:
 ```shell
 python3.10 -m venv sciborg-env
 source sciborg-env/bin/activate
@@ -46,7 +46,7 @@ from sciborg.ai.agents.core import create_linqx_chat_agent
 from sciborg.ai.chains.microservice import module_to_microservice
 from sciborg.ai.chains.workflow import create_workflow_planner_chain, create_workflow_constructor_chain
 
-from sciborg.testing.models.drivers import MicrowaveSynthesizer, MicrowaveSynthesizerObject, PubChemCaller
+from sciborg.utils.drivers import MicrowaveSynthesizer, MicrowaveSynthesizerObject, PubChemCaller
 from sciborg.core.library.base import BaseDriverMicroservice
 ```
 If the above command runs without any errors, the installation was successful and the SciBORG agent is ready to use.
@@ -58,11 +58,8 @@ sciborg/
   ai/
   core/
   embeddings/
-  LCU/
-  lcu-remote-client/
-  microservices/
   notebooks/
-  testing/
+  tests/
   utils/
   README.md
   requirements.txt
@@ -70,13 +67,12 @@ sciborg/
 
 #### Directory Structure Explanation:
 
-- `ai/`: Contains implementations of various AI agents that drive SciBORG’s functionality, including the RAG agent and other pre-built agents.
+- `ai/`: Contains implementations of various AI agents that drive SciBORG's functionality, including the RAG agent and other pre-built agents.
 - `core/`: The core logic and infrastructure that powers SciBORG, including utilities for agent management, execution, and task orchestration.
 - `embeddings/`: Stores models and logic for generating and managing document embeddings. This folder is essential for supporting tasks like document similarity and context retrieval.
-- `microservices/`: Houses microservices that enable SciBORG to interact with other applications, databases, and APIs, facilitating the broader applicability of the agents.
-- `notebooks/`: Jupyter notebooks providing tutorials, demos, and examples for using SciBORG agents. This folder is highly recommended for new users to understand SciBORG’s capabilities.
-- `testing/`: Test cases and scripts to verify the accuracy, reliability, and performance of each component and agent within SciBORG.
-- `utils/`: Utility scripts and helper functions that support various tasks across SciBORG, like benchmarking.
+- `notebooks/`: Jupyter notebooks providing tutorials, demos, and examples for using SciBORG agents. This folder is highly recommended for new users to understand SciBORG's capabilities.
+- `tests/`: All testing code including test scripts, testing notebooks, and validation scripts. Organized into `tests/notebooks/` and `tests/scripts/` subdirectories.
+- `utils/`: Utility scripts and helper functions that support various tasks across SciBORG, like benchmarking. Also contains example drivers in `utils/drivers/`.
 
 ## Creating Agents
 
@@ -138,7 +134,7 @@ pubchem_and_rag_agent = create_linqx_chat_agent(
 What do these paramaters mean?
 - `microservice`: The microservice that the agent will use to interact with external services or APIs.
 - `rag_vectordb_path`: The path to the document embeddings used by the RAG agent for context retrieval.
-- `llm`: The language model used by the agent for generating responses. In this case, it’s the GPT-4 model.
+- `llm`: The language model used by the agent for generating responses. In this case, it's the GPT-4 model.
 - `human_interaction`: A boolean flag to enable or disable human interaction with the agent.
 
 For detailed demonstrations and examples, refer to the Jupyter notebooks `notebooks/SI/SI_traces_01.ipynb` and `notebooks/SI/SI_traces_02.ipynb` in the repository.
@@ -155,6 +151,6 @@ For additional details on benchmarking and usage, refer to the `notebooks/SI/SI_
 Task: link the folder to the notebooks
 
 ## Additional Resources (adding soon...)
-Explore additional details on extending SciBORG’s functionality with custom integrations:
+Explore additional details on extending SciBORG's functionality with custom integrations:
 - Creating Custom Integrations: Learn how to add new agents to SciBORG, configure workflows, and customize agents for specific needs. (add in readme file to help do this)
 - Adding Custom Document Embeddings: Understand how to integrate different embeddings for specialized document types or formats. (add in a readme file and a code file to help do this)

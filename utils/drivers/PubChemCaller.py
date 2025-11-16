@@ -71,7 +71,7 @@ from typing import Dict
 import pandas as pd
 import json
 import requests
-from ASPIRE_LINQX.ai.tools.constants import PUBCHEM, OUTPUT_FORMAT, PROPERTIES, CACTUS
+from sciborg.ai.tools.constants import PUBCHEM, OUTPUT_FORMAT, PROPERTIES, CACTUS
 import pprint
 
 #? Should I shift these two helper functions somwhere else and import them here?
@@ -89,16 +89,36 @@ def _convert_to_string(l_ids) -> dict:
 def _get_request(url, response_type='json') -> dict:
     """
     This is a helper function to make a GET request to the given URL and return the JSON response. MUST not be used directly.
+    
+    Args:
+        url: The URL to make the GET request to
+        response_type: Type of response expected ('json' or 'text')
+        
+    Returns:
+        dict: Response data or None if error occurred
+        
+    Raises:
+        requests.RequestException: If there's an error making the request
     """
-    response = requests.get(url)
-    if response.status_code == 200:
+    try:
+        response = requests.get(url, timeout=30)  # Add timeout for security
+        response.raise_for_status()  # Raise exception for bad status codes
         if response_type == 'json':
             return response.json()
         else:
             return {"response": response.text}
-    else: 
-        print('Error: \n Staus code: {}\nMessage: {}\n URL created: {}'.format(response.status_code, response.text, url))
-        return None  # or return some error indicating that the request URL is not valid
+    except requests.Timeout:
+        print(f'Error: Request timeout for URL: {url}')
+        return None
+    except requests.HTTPError as e:
+        print(f'Error: HTTP {e.response.status_code} - {e.response.text}\nURL: {url}')
+        return None
+    except requests.RequestException as e:
+        print(f'Error: Request failed - {e}\nURL: {url}')
+        return None
+    except ValueError as e:
+        print(f'Error: Invalid JSON response - {e}\nURL: {url}')
+        return None
 
 
 # def get_sids_from_cid(inp:str, inp_type:str='compound') -> dict:
@@ -161,14 +181,21 @@ def get_cid_from_name(inp: str) -> dict:
     dict: a dictionary of cids for the given chemical name
 
     """
+    if not inp or not isinstance(inp, str) or not inp.strip():
+        return {"error": "Invalid input: chemical name must be a non-empty string"}
+    
     try:
-        url = '/'.join([PUBCHEM, 'substance', 'name', inp, 'cids', 'TXT'])
+        # Sanitize input to prevent URL injection
+        inp_clean = inp.strip().replace(' ', '%20')
+        url = '/'.join([PUBCHEM, 'substance', 'name', inp_clean, 'cids', 'TXT'])
         res = _get_request(url, 'text')
+        if res is None:
+            return {"error": "Failed to retrieve CID from PubChem API"}
         res = set(res['response'].replace(" ", "").split('\n'))
         return {"response": res}
     except Exception as e:
-        print('An error occurred:', e)
-        return str(e)
+        print(f'An error occurred in get_cid_from_name: {e}')
+        return {"error": str(e)}
 
 #CACTUS: Name to SMILES
 def get_smiles_from_name(inp: str) -> dict:
@@ -182,13 +209,20 @@ def get_smiles_from_name(inp: str) -> dict:
     returns
     str: a text representing the SMILES for the given chemical name
     '''
+    if not inp or not isinstance(inp, str) or not inp.strip():
+        return {"error": "Invalid input: chemical name must be a non-empty string"}
+    
     try:
-        url = '/'.join([CACTUS, inp, 'smiles'])
-        return _get_request(url, 'text')
+        # Sanitize input to prevent URL injection
+        inp_clean = inp.strip().replace(' ', '%20')
+        url = '/'.join([CACTUS, inp_clean, 'smiles'])
+        result = _get_request(url, 'text')
+        if result is None:
+            return {"error": "Failed to retrieve SMILES from CACTUS API"}
+        return result
     except Exception as e:
-        print('An error occurred:', e)
-        # return e
-        return None
+        print(f'An error occurred in get_smiles_from_name: {e}')
+        return {"error": str(e)}
 
 def get_synonym(inp: str, inp_format: str, inp_type: str) -> dict:
     '''

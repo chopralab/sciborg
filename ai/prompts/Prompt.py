@@ -1,4 +1,4 @@
-from langchain.agents import StructuredChatAgent
+from langchain_classic.agents import StructuredChatAgent
 
 from sciborg.ai.tools.Tools import (
     template_builder_tools,
