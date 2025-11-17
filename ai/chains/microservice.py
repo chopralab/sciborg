@@ -4,12 +4,62 @@ from inspect import getmembers, isfunction, isclass, ismethod, signature, getdoc
 from types import ModuleType, FunctionType
 from pydantic import BaseModel as BaseModelV2
 import json
+import re
 from langchain_core.language_models import BaseLanguageModel
 # from langchain.pydantic_v1 import BaseModel as BaseModelV1
 from uuid import UUID, uuid4
 from sciborg.core.command.base import BaseDriverCommand, BaseInfoCommand
 from sciborg.core.library.base import BaseDriverMicroservice
 from sciborg.ai.chains.core import create_sciborg_command_parser
+
+
+def extract_docstring(func: FunctionType) -> str | None:
+    """
+    Extract docstring from a function, handling edge cases like f-strings.
+    
+    This function tries multiple methods to extract a docstring:
+    1. Standard getdoc() (works for proper docstrings)
+    2. Source code parsing for f-strings or unassigned string literals
+    
+    Args:
+        func: The function to extract docstring from
+        
+    Returns:
+        The docstring as a string, or None if not found
+    """
+    # First try standard docstring extraction
+    doc = getdoc(func)
+    if doc:
+        return doc
+    
+    # If no docstring found, try to extract from source code
+    try:
+        source = getsource(func)
+        # Look for f-strings or regular strings right after function definition
+        # Pattern: function definition followed by optional comments, then f'''...''' or '''...''' or """..."""
+        # Match f-strings (f''' or f""")
+        fstring_pattern = r'f[\'"]{3}(.*?)[\'"]{3}'
+        # Match regular docstrings (''' or """)
+        docstring_pattern = r'[\'"]{3}(.*?)[\'"]{3}'
+        
+        # Try to find f-string first (more specific)
+        fstring_match = re.search(fstring_pattern, source, re.DOTALL)
+        if fstring_match:
+            # Extract the content and try to format it (remove f-string syntax)
+            content = fstring_match.group(1)
+            # Remove any {variable} references for now, or we could try to evaluate them
+            # For now, just return the content as-is
+            return content.strip()
+        
+        # Try regular docstring pattern
+        docstring_match = re.search(docstring_pattern, source, re.DOTALL)
+        if docstring_match:
+            return docstring_match.group(1).strip()
+    except (OSError, TypeError):
+        # If source code can't be retrieved, just return None
+        pass
+    
+    return None
 
 def function_to_driver_command(
     func: FunctionType,
@@ -28,6 +78,9 @@ def function_to_driver_command(
     llm: BaseLanguageModel | None = None # Custom LLM for parsing (default to GPT 3.5 turbo)
     ```
     '''
+    # Extract docstring using robust extraction (handles f-strings, etc.)
+    doc = extract_docstring(func)
+    
     # Define function input query
     query = """
     Create a command from the below information. 
@@ -44,7 +97,7 @@ def function_to_driver_command(
         microservice=microservice,
         uuid=str(uuid),
         signature=str(signature(func)),
-        doc=getdoc(func)
+        doc=doc if doc else ""
     )
 
     # Use LLM to format

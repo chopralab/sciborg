@@ -12,9 +12,10 @@ Example drivers:
 """
 
 # Import drivers
-from .MicrowaveSynthesizer import MicrowaveSynthesizer
+import importlib
+MicrowaveSynthesizer = importlib.import_module('sciborg.utils.drivers.MicrowaveSynthesizer')
 from .MicrowaveSynthesizerObject import MicrowaveSynthesizer as MicrowaveSynthesizerObject
-from .PubChemCaller import PubChemCaller
+PubChemCaller = importlib.import_module('sciborg.utils.drivers.PubChemCaller')
 from .grantsGovCaller import search_opportunities
 from .ragCaller import external_information_retrieval, _create_rag_agent_executor
 

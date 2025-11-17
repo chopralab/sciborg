@@ -12,6 +12,7 @@ from langchain_classic.agents.output_parsers import OpenAIFunctionsAgentOutputPa
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.utils.function_calling import convert_to_openai_function
 from langchain_core.language_models import BaseLanguageModel
+from sciborg.ai.chains.microservice import extract_docstring
 
 from sciborg.utils.drivers.PubChemCaller import (
     get_synonym,
@@ -48,14 +49,20 @@ def pubchem_agent(
         result = agent.invoke({"question": "What is the molecular weight of caffeine?"})
         ```
     """
+    # Wrap functions with @tool decorator
+    # extract_docstring handles f-strings and edge cases that tool() can't read
+    # It optimizes internally by checking func.__doc__ first, so overhead is minimal
     tools = [
-        get_synonym,
-        get_description,
-        get_assay_description,
-        get_assay_name_from_aid,
-        get_compound_property_table,
-        get_cid_from_name,
-        get_smiles_from_name
+        tool(func, description=extract_docstring(func))
+        for func in [
+            get_synonym,
+            get_description,
+            get_assay_description,
+            get_assay_name_from_aid,
+            get_compound_property_table,
+            get_cid_from_name,
+            get_smiles_from_name
+        ]
     ]
 
     llm_with_tools = llm.bind(functions=[convert_to_openai_function(t) for t in tools])

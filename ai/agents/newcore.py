@@ -5,7 +5,7 @@ This module provides the main class-based agent implementation for SciBORG.
 It includes support for:
 - Multiple memory types (chat, action, embedding, FSA)
 - Memory persistence (save/load)
-- Workflow planning and graph visualization
+- Workflow planning
 - RAG integration
 - FSA (Finite State Automaton) support
 - Agent-to-agent communication
@@ -58,11 +58,8 @@ from sciborg.ai.prompts.agent import (
 )
 from sciborg.ai.tools.core import LinqxTool
 from sciborg.ai.agents.rag_agent import rag_agent
-from sciborg.ai.chains.create_validation_model import create_validation_models_from_json
 from sciborg.ai.prompts.memory import ACTION_LOG_FSA_TEMPLATE
-from sciborg.utils.graph.graph import GraphViz
-from sciborg.utils.graph.edge import Edge
-from sciborg.utils.graph.node import Node
+
 
 
 class SciborgAgentExecutor(AgentExecutor):
@@ -72,7 +69,6 @@ class SciborgAgentExecutor(AgentExecutor):
     Extends the base AgentExecutor to provide:
     - FSA state management
     - Custom action hooks for state updates
-    - Graph visualization support
     - Node highlighting based on state checks
     """
     
@@ -81,7 +77,6 @@ class SciborgAgentExecutor(AgentExecutor):
     fsa_schema: Type[BaseModel] = None
     current_fsa: BaseModel = None
     llm_chain: Optional[Runnable] = None
-    graph: Optional[GraphViz] = None
 
     def __init__(self, **data: Any):
         """Initialize the executor with FSA support."""
@@ -219,7 +214,7 @@ class SciborgAgent:
     - Operate microservices through commands
     - Use multiple memory types (chat, action, embedding, FSA)
     - Save and load memory state
-    - Plan and execute workflows with graph visualization
+    - Plan and execute workflows
     - Integrate with RAG for document retrieval
     - Support agent-to-agent communication
     
@@ -257,7 +252,6 @@ class SciborgAgent:
         verbose: bool = False,
         return_intermediate_steps: bool = False,
         memory_file: str | None = None,
-        graph_viz_uri: str | None = None,
         **agent_executor_kwargs
     ):
         """
@@ -284,7 +278,6 @@ class SciborgAgent:
             verbose: Enable verbose logging
             return_intermediate_steps: Return intermediate steps in response
             memory_file: Path to memory file for persistence
-            graph_viz_uri: URI for graph visualization service
             **agent_executor_kwargs: Additional kwargs for AgentExecutor
         """
         # Store configuration
@@ -300,9 +293,6 @@ class SciborgAgent:
         self.agent_executor_kwargs = agent_executor_kwargs
         self.memory_file = memory_file
         self.fsa_schema = fsa_schema
-        # Use environment variable if graph_viz_uri not provided
-        import os
-        self.graph_viz_uri = graph_viz_uri or os.getenv('SCIBORG_GRAPH_VIZ_URI', None)
         
         # Initialize FSA object if schema provided
         if fsa_object is not None:
@@ -319,7 +309,6 @@ class SciborgAgent:
         self.memory = self._initialize_memory(intermediate_memory_buffer, past_action_log, agent_as_a_fsa, fsa_schema, fsa_object)
         self.prompt = self._build_prompt(prompt_template, rag_vectordb_path, past_action_log)
         self.agent_executor = self._create_agent_executor()
-        self.graph = None
 
     @property
     def fsa_object(self) -> BaseModel | None:
@@ -804,7 +793,7 @@ class SciborgAgent:
     
     def prime(self, input_content: str) -> None:
         """
-        Prime the agent with a workflow description and create graph visualization.
+        Prime the agent with a workflow description.
         
         NOTE: This method has been disabled as stateflow functionality has been removed.
         For workflow visualization, consider using alternative methods or re-implementing
