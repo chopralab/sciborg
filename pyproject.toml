@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sciborg"
+version = "1.0.0"
+description = "SciBORG: A framework for building agents that automate scientific discovery"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Chopra Lab - Atharva Parikh and Matthew Muhoberac", email = "chopralab@gmail.com"}
+]
+keywords = ["ai", "agents", "scientific-discovery", "langchain", "automation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering",
+]
+
+# Core dependencies (required for basic functionality)
+dependencies = [
+    "langchain>=1.0.5",
+    "langchain-classic>=1.0.0",
+    "langchain-community>=0.4.1",
+    "langchain-core>=1.0.4",
+    "langchain-openai>=1.0.2",
+    "langchain-text-splitters>=1.0.0",
+    "langsmith>=0.3.33",
+    "pydantic>=2.12.4",
+    "pydantic-core>=2.41.0",
+    "numpy>=2.3.4",
+    "typing-extensions>=4.13.2",
+    "setuptools>=75.1.0",
+    "protobuf>=6.30.2",
+    "pandas>=2.3.3",
+    "requests>=2.32.5",
+    "beautifulsoup4>=4.14.2",
+    "faiss-cpu>=1.12.0",
+    "sentence-transformers>=5.1.2",
+    "torch>=2.9.0",
+    "transformers>=4.57.1",
+    "pymupdf>=1.26.6",
+    "pdf2image>=1.17.0",
+    "pdfplumber>=0.11.8",
+    "pytesseract>=0.3.13",
+    "Pillow>=11.2.1",
+    "matplotlib>=3.10.1",
+    "networkx>=3.4.2",
+    "tqdm>=4.67.1",
+    "python-dotenv>=1.0.1",
+    "nest-asyncio>=1.6.0",
+    "tiktoken>=0.8.0",
+    "tenacity>=9.0.0",
+    "psutil>=6.0.0",
+    "spython>=0.3.14",
+    "PyJWT>=2.10.1",
+]
+
+# Optional dependencies (extras)
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.2",
+    "pytest-cov>=4.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/chopralab/sciborg"
+Documentation = "https://github.com/chopralab/sciborg#readme"
+Repository = "https://github.com/chopralab/sciborg"
+Issues = "https://github.com/chopralab/sciborg/issues"
+
+[tool.setuptools]
+# Automatically discover packages
+packages = { find = {} }
+
+[tool.setuptools.package-data]
+sciborg = [
+    "embeddings/**/*",
+]
+
