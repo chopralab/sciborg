@@ -1,0 +1,72 @@
+# Ignore Python bytecode and cache
+**/__pycache__/
+*.py[cod]
+
+# VSCode and PyCharm editors
+.vscode/
+.idea/
+
+# Environment files
+.env
+.env.*
+*.env
+*.venv
+venv/
+ENV/
+env/
+.venv/
+
+# Jupyter and IPython
+.ipynb_checkpoints/
+*.ipynb
+!notebooks/**/*.ipynb
+
+# MacOS and system files
+.DS_Store
+Thumbs.db
+
+# pytest, test, and coverage outputs
+.cache/
+*.log
+*.cover
+coverage.*
+
+# build/dist artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# FAISS embeddings (large binary files)
+*.faiss
+
+# MyPy and Pyright outputs
+.mypy_cache/
+.pyrightcache/
+
+# Wheels
+*.whl
+
+# Language server files
+.pyre/
+.pytype/
+
+# Temporary/pid/backup files
+*.tmp
+*.bak
+*.swp
+*.swo
+*.pid
+
+# Output artifacts
+*.sqlite3
+*.db
+
+# IntelliJ & JetBrains stuff
+*.iml
+
+# Node
+node_modules/
+
+# PyCharm jupyter notebook metadata
+.ipynb-meta

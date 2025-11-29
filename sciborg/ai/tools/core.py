@@ -1,15 +1,43 @@
-from typing import Dict, Any, Coroutine, Callable, Tuple, Type
-from inspect import signature, getdoc
-from pydantic import ValidationError as ValidationErrorV2 # Our infrastructure uses Pydantic V2, which will throw this ValidationError
+from typing import Dict, Any, Coroutine, Callable, Tuple, Type, get_type_hints
+from inspect import signature, getdoc, Parameter
+from pydantic import ValidationError as ValidationErrorV2, create_model, Field
 import re
 
 from langchain_core.tools import BaseTool
-# from langchain.pydantic_v1 import root_validator
 from pydantic import model_validator
-# from langchain.pydantic_v1 import ValidationError as ValidationErrorV1
-from langchain_core.tools import create_schema_from_function, ToolException
+from langchain_core.tools import ToolException
 
 from sciborg.core.command.base import BaseDriverCommand
+
+
+def create_args_schema_from_function(func: Callable, model_name: str) -> Type:
+    """
+    Create a Pydantic model from a function signature.
+    This is a custom implementation that avoids issues with langchain's create_schema_from_function.
+    """
+    sig = signature(func)
+    hints = {}
+    try:
+        hints = get_type_hints(func)
+    except Exception:
+        pass
+    
+    fields = {}
+    for param_name, param in sig.parameters.items():
+        if param_name in ('self', 'cls'):
+            continue
+        
+        # Get the type annotation
+        param_type = hints.get(param_name, str)
+        
+        # Handle default values
+        if param.default is Parameter.empty:
+            fields[param_name] = (param_type, ...)
+        else:
+            fields[param_name] = (param_type, param.default)
+    
+    return create_model(model_name, **fields)
+
 
 class LinqxTool(BaseTool):
     '''
@@ -30,9 +58,10 @@ class LinqxTool(BaseTool):
         '''
         values['name'] = values['sciborg_command'].name
         values['description'] = f"Function Signature:\n{signature(values['sciborg_command']._function)}\nFunction Docstring:\n{getdoc(values['sciborg_command']._function)}"
-        values['args_schema'] = create_schema_from_function(
-            model_name=f"{values['sciborg_command'].name}_",
-            func=values['sciborg_command']._function
+        # Use custom schema creation to avoid langchain compatibility issues
+        values['args_schema'] = create_args_schema_from_function(
+            func=values['sciborg_command']._function,
+            model_name=f"{values['sciborg_command'].name}_"
         )
         return values
     
@@ -52,6 +81,31 @@ class LinqxTool(BaseTool):
         sanatized_e = sanatized_e.rstrip()
         return sanatized_e
 
+    @staticmethod
+    def _is_schema_dict(value: Any) -> bool:
+        '''
+        Check if a value looks like a JSON Schema definition rather than an actual value.
+        Schema dicts typically have 'type' and optionally 'title' keys.
+        '''
+        if not isinstance(value, dict):
+            return False
+        schema_keys = {'type', 'title', 'description', 'properties', 'required'}
+        return bool(schema_keys.intersection(value.keys())) and 'type' in value
+    
+    @staticmethod
+    def _clean_schema_from_kwargs(kwargs: Dict[str, Any]) -> Dict[str, Any]:
+        '''
+        Remove any kwargs that look like JSON Schema definitions.
+        This handles edge cases where schema metadata is passed instead of values.
+        '''
+        cleaned = {}
+        for key, value in kwargs.items():
+            if LinqxTool._is_schema_dict(value):
+                # Skip schema-like dictionaries - they shouldn't be passed as values
+                continue
+            cleaned[key] = value
+        return cleaned
+
     def _run(self, tool_input: str | dict[str, Any] | None = None, **kwargs) -> str:
         '''
         The tool calls the SCIBORG command with keyword arguments provided by the LLM in a try/catch statement.
@@ -67,11 +121,16 @@ class LinqxTool(BaseTool):
         # Handle both dict input and keyword arguments
         if tool_input is not None:
             if isinstance(tool_input, dict):
-                kwargs.update(tool_input)
+                # Clean out any schema-like values before merging
+                cleaned_input = self._clean_schema_from_kwargs(tool_input)
+                kwargs.update(cleaned_input)
             elif isinstance(tool_input, str):
                 # If string input, try to parse or use as single argument
                 # This shouldn't happen with structured tools, but handle gracefully
                 pass
+        
+        # Also clean kwargs directly in case schema values were passed there
+        kwargs = self._clean_schema_from_kwargs(kwargs)
         
         try: 
             return str(self.sciborg_command(**kwargs))
