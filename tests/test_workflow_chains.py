@@ -1,8 +1,7 @@
 """
-Temporary test script for Component 2: Workflow Chains migration verification.
-Delete after successful migration.
+Workflow chains tests for SciBORG.
 
-This script verifies that workflow chains work correctly after updating to LCEL.
+This test suite verifies that workflow chains work correctly after updating to LCEL.
 """
 import sys
 import os
@@ -38,135 +37,57 @@ sys.path.insert(0, str(project_root))
 
 def test_workflow_chains_imports():
     """Test workflow chains imports"""
-    print("Testing workflow chains imports...")
+    from sciborg.ai.chains.workflow import (
+        create_workflow_planner_chain,
+        create_workflow_constructor_chain
+    )
     
-    try:
-        from sciborg.ai.chains.workflow import (
-            create_workflow_planner_chain,
-            create_workflow_constructor_chain
-        )
-        print("  ✓ Workflow chains imports successful")
-    except ImportError as e:
-        print(f"  ✗ Import failed: {e}")
-        return False
-    
-    return True
+    assert create_workflow_planner_chain is not None
+    assert create_workflow_constructor_chain is not None
 
 def test_return_types():
     """Test that functions return RunnableSequence"""
-    print("\nTesting return types...")
+    from sciborg.ai.chains.workflow import (
+        create_workflow_planner_chain,
+        create_workflow_constructor_chain
+    )
+    from langchain_core.runnables import RunnableSequence
+    from langchain_openai import ChatOpenAI
+    from sciborg.core.library.base import BaseCommandLibrary
     
-    try:
-        from sciborg.ai.chains.workflow import (
-            create_workflow_planner_chain,
-            create_workflow_constructor_chain
-        )
-        from langchain_core.runnables import RunnableSequence
-        from langchain_openai import ChatOpenAI
-        from sciborg.core.library.base import BaseCommandLibrary
-        
-        # Create a minimal library for testing
-        library = BaseCommandLibrary(name="test", microservices={})
-        llm = ChatOpenAI(model='gpt-4', temperature=0.1)
-        
-        # Test planner chain
-        planner_chain = create_workflow_planner_chain(library, llm)
-        if isinstance(planner_chain, RunnableSequence):
-            print("  ✓ create_workflow_planner_chain returns RunnableSequence")
-        else:
-            print(f"  ✗ create_workflow_planner_chain returns {type(planner_chain)}, expected RunnableSequence")
-            return False
-        
-        # Test constructor chain
-        constructor_chain = create_workflow_constructor_chain(library, llm)
-        if isinstance(constructor_chain, RunnableSequence):
-            print("  ✓ create_workflow_constructor_chain returns RunnableSequence")
-        else:
-            print(f"  ✗ create_workflow_constructor_chain returns {type(constructor_chain)}, expected RunnableSequence")
-            return False
-            
-    except Exception as e:
-        print(f"  ✗ Error testing return types: {e}")
-        return False
+    # Create a minimal library for testing
+    library = BaseCommandLibrary(name="test", microservices={})
+    llm = ChatOpenAI(model='gpt-4', temperature=0.1)
     
-    return True
+    # Test planner chain
+    planner_chain = create_workflow_planner_chain(library, llm)
+    assert isinstance(planner_chain, RunnableSequence), \
+        f"Expected RunnableSequence, got {type(planner_chain)}"
+    
+    # Test constructor chain
+    constructor_chain = create_workflow_constructor_chain(library, llm)
+    assert isinstance(constructor_chain, RunnableSequence), \
+        f"Expected RunnableSequence, got {type(constructor_chain)}"
 
 def test_lcel_compatibility():
     """Test that LCEL chains can be invoked"""
-    print("\nTesting LCEL chain compatibility...")
+    from sciborg.ai.chains.workflow import create_workflow_planner_chain
+    from langchain_openai import ChatOpenAI
+    from langchain_core.runnables import Runnable
+    from sciborg.core.library.base import BaseCommandLibrary
     
-    try:
-        from sciborg.ai.chains.workflow import create_workflow_planner_chain
-        from langchain_openai import ChatOpenAI
-        from langchain_core.runnables import RunnableSequence
-        from sciborg.core.library.base import BaseCommandLibrary
-        
-        # Create a minimal library for testing
-        library = BaseCommandLibrary(name="test", microservices={})
-        llm = ChatOpenAI(model='gpt-4', temperature=0.1)
-        
-        # Create chain
-        chain = create_workflow_planner_chain(library, llm)
-        
-        # Check if chain has invoke method (RunnableSequence should have this)
-        if hasattr(chain, 'invoke'):
-            print("  ✓ Chain has invoke method (LCEL compatible)")
-        else:
-            print("  ✗ Chain does not have invoke method")
-            return False
-        
-        # Check if chain has stream method (RunnableSequence should have this)
-        if hasattr(chain, 'stream'):
-            print("  ✓ Chain has stream method (LCEL compatible)")
-        else:
-            print("  ⚠ Chain does not have stream method")
-        
-        # Check if it's a RunnableSequence type
-        from langchain_core.runnables import Runnable
-        if isinstance(chain, Runnable):
-            print("  ✓ Chain is a Runnable (LCEL compatible)")
-        else:
-            print(f"  ⚠ Chain type is {type(chain)}, expected Runnable")
-            
-    except Exception as e:
-        print(f"  ✗ Error testing LCEL compatibility: {e}")
-        return False
+    # Create a minimal library for testing
+    library = BaseCommandLibrary(name="test", microservices={})
+    llm = ChatOpenAI(model='gpt-4', temperature=0.1)
     
-    return True
+    # Create chain
+    chain = create_workflow_planner_chain(library, llm)
+    
+    # Check if chain has invoke method (RunnableSequence should have this)
+    assert hasattr(chain, 'invoke'), "Chain should have invoke method (LCEL compatible)"
+    
+    # Check if it's a Runnable type
+    assert isinstance(chain, Runnable), \
+        f"Chain should be a Runnable, got {type(chain)}"
 
-def main():
-    """Run all workflow chains tests"""
-    print("=" * 60)
-    print("Component 2: Workflow Chains Test")
-    print("=" * 60)
-    
-    results = []
-    
-    results.append(("Imports", test_workflow_chains_imports()))
-    results.append(("Return types", test_return_types()))
-    results.append(("LCEL compatibility", test_lcel_compatibility()))
-    
-    print("\n" + "=" * 60)
-    print("Test Results Summary:")
-    print("=" * 60)
-    
-    all_passed = True
-    for test_name, passed in results:
-        status = "✓ PASS" if passed else "✗ FAIL"
-        print(f"  {status}: {test_name}")
-        if not passed:
-            all_passed = False
-    
-    print("\n" + "=" * 60)
-    if all_passed:
-        print("✓ All workflow chains tests passed!")
-        print("Component 2 migration verified successfully.")
-    else:
-        print("✗ Some tests failed. Please review the errors above.")
-    print("=" * 60)
-    
-    return 0 if all_passed else 1
-
-if __name__ == "__main__":
-    exit(main())
 

@@ -42,7 +42,7 @@ import sys
 sys.path.insert(1, "path to the parent of this folder") 
 
 from langchain_openai import ChatOpenAI
-from sciborg.ai.agents.core import create_linqx_chat_agent
+from sciborg.ai.agents.core import create_sciborg_chat_agent
 from sciborg.ai.chains.microservice import module_to_microservice
 from sciborg.ai.chains.workflow import create_workflow_planner_chain, create_workflow_constructor_chain
 
@@ -55,24 +55,26 @@ If the above command runs without any errors, the installation was successful an
 If the installation was successful, the directory structure should look like this:
 ```
 sciborg/
-  ai/
-  core/
-  embeddings/
-  notebooks/
-  tests/
-  utils/
+  sciborg/          # Main package (installed via pip)
+    ai/             # AI agents, chains, memory, prompts, schema, tools
+    core/           # Core infrastructure (commands, library, parameters, workflows)
+    utils/          # Utilities (benchmarking, example drivers)
+    embeddings/     # Embeddings data
+  notebooks/        # Example notebooks (not in package)
+  tests/            # Test suite (not in package)
   README.md
   requirements.txt
+  pyproject.toml
 ```
 
 #### Directory Structure Explanation:
 
-- `ai/`: Contains implementations of various AI agents that drive SciBORG's functionality, including the RAG agent and other pre-built agents.
-- `core/`: The core logic and infrastructure that powers SciBORG, including utilities for agent management, execution, and task orchestration.
-- `embeddings/`: Stores models and logic for generating and managing document embeddings. This folder is essential for supporting tasks like document similarity and context retrieval.
+- `sciborg/ai/`: Contains implementations of various AI agents that drive SciBORG's functionality, including the RAG agent and other pre-built agents.
+- `sciborg/core/`: The core logic and infrastructure that powers SciBORG, including utilities for agent management, execution, and task orchestration.
+- `sciborg/embeddings/`: Stores embeddings data used for document similarity and context retrieval.
+- `sciborg/utils/`: Utility scripts and helper functions that support various tasks across SciBORG, like benchmarking. Also contains example drivers in `sciborg/utils/drivers/`.
 - `notebooks/`: Jupyter notebooks providing tutorials, demos, and examples for using SciBORG agents. This folder is highly recommended for new users to understand SciBORG's capabilities.
-- `tests/`: All testing code including test scripts, testing notebooks, and validation scripts. Organized into `tests/notebooks/` and `tests/scripts/` subdirectories.
-- `utils/`: Utility scripts and helper functions that support various tasks across SciBORG, like benchmarking. Also contains example drivers in `utils/drivers/`.
+- `tests/`: All testing code including unit tests and integration tests.
 
 ## Creating Agents
 
@@ -101,7 +103,7 @@ with open(file_path, 'w') as outfile:
 The RAG Agent (Retrieval-Augmented Generation) is used for answering scientific questions based on provided context. To use the RAG agent, run the following command:
 
 ```python
-rag_agent = create_linqx_chat_agent(
+rag_agent = create_sciborg_chat_agent(
     microservice=driver_command_microservice,
     rag_vectordb_path = '<path>/embeddings/NIH_docs_embeddings',
     llm=ChatOpenAI(model='gpt-4'),
@@ -112,7 +114,7 @@ rag_agent = create_linqx_chat_agent(
 
 ### Pubchem Agent
 ```python
-pubchem_agent = create_linqx_chat_agent(
+pubchem_agent = create_sciborg_chat_agent(
     microservice=pubchem_command_microservice,
     llm=ChatOpenAI(model='gpt-4'),
     human_interaction=False,
@@ -122,7 +124,7 @@ pubchem_agent = create_linqx_chat_agent(
 
 ### PubChem and RAG Agent
 ```python
-pubchem_and_rag_agent = create_linqx_chat_agent(
+pubchem_and_rag_agent = create_sciborg_chat_agent(
     microservice=pubchem_command_microservice,
     rag_vectordb_path = '<path>/embeddings/NIH_docs_embeddings',
     llm=ChatOpenAI(model='gpt-4'),

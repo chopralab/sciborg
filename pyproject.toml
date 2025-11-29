@@ -10,13 +10,12 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "Chopra Lab", email = "your-email@example.com"}
+    {name = "Chopra Lab - Atharva Parikh and Matthew Muhoberac", email = "chopralab@gmail.com"}
 ]
 keywords = ["ai", "agents", "scientific-discovery", "langchain", "automation"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -59,18 +58,15 @@ dependencies = [
     "tenacity>=9.0.0",
     "psutil>=6.0.0",
     "spython>=0.3.14",
-    "pytest>=8.3.2",
     "PyJWT>=2.10.1",
 ]
 
 # Optional dependencies (extras)
-# [project.optional-dependencies]
-# Add optional dependencies here when needed
-# Example:
-# langgraph = [
-#     "langgraph>=0.2.0",
-#     "langgraph-sdk>=0.1.63",
-# ]
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.2",
+    "pytest-cov>=4.1.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/chopralab/sciborg"
@@ -79,11 +75,11 @@ Repository = "https://github.com/chopralab/sciborg"
 Issues = "https://github.com/chopralab/sciborg/issues"
 
 [tool.setuptools]
-packages = ["sciborg"]
+# Automatically discover packages
+packages = { find = {} }
 
 [tool.setuptools.package-data]
-sciborg = ["embeddings/**/*"]
-
-[tool.setuptools.package-dir]
-"" = "."
+sciborg = [
+    "embeddings/**/*",
+]
 

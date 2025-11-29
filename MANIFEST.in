@@ -1,0 +1,23 @@
+# Include essential files
+include README.md
+include LICENSE
+include pyproject.toml
+
+# Include package data (embeddings)
+recursive-include sciborg/embeddings *.faiss
+
+# Exclude unnecessary files
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude *.so
+global-exclude .DS_Store
+global-exclude .env*
+
+# Exclude development and build files
+prune tests
+prune notebooks
+prune images
+prune *.egg-info
+prune build
+prune dist
+

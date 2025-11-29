@@ -1,19 +1,14 @@
 # Tests Directory
 
-This directory contains all testing code for SciBORG, organized into:
+This directory contains all testing code for SciBORG.
 
 ## Structure
 
 ```
 tests/
-├── test_dependencies.py      # Dependency verification tests
-├── test_workflow_chains.py    # Workflow chains tests
-├── notebooks/                 # Testing notebooks
-│   ├── experimental.ipynb
-│   ├── experiment2.ipynb
-│   └── experiment3.ipynb
-└── scripts/                   # Testing scripts
-    └── raw_testall.py
+├── test_dependencies.py         # Dependency verification tests
+├── test_workflow_chains.py      # Workflow chains tests
+└── test_agent_integration.py    # Integration tests for agents
 ```
 
 ## Test Files
@@ -23,7 +18,7 @@ Verifies that all required packages can be imported correctly after updating to 
 
 **Usage:**
 ```bash
-python tests/test_dependencies.py
+pytest tests/test_dependencies.py
 ```
 
 ### `test_workflow_chains.py`
@@ -31,14 +26,20 @@ Verifies that workflow chains work correctly after updating to LCEL.
 
 **Usage:**
 ```bash
-python tests/test_workflow_chains.py
+pytest tests/test_workflow_chains.py
 ```
 
-## Notebooks
+### `test_agent_integration.py`
+Integration tests for SciBORG agents using real API calls. Requires `OPENAI_API_KEY` environment variable.
 
-The `notebooks/` subdirectory contains experimental and testing notebooks for development and validation.
+**Usage:**
+```bash
+pytest tests/test_agent_integration.py
+```
 
-## Scripts
+## Running All Tests
 
-The `scripts/` subdirectory contains utility scripts for testing various components.
+```bash
+pytest tests/ -v
+```
 

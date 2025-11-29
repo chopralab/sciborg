@@ -1,8 +1,7 @@
 """
-Temporary test script for Component 1: Dependencies & Requirements migration verification.
-Delete after successful migration.
+Dependency verification tests for SciBORG.
 
-This script verifies that all required packages can be imported correctly
+This test suite verifies that all required packages can be imported correctly
 after updating to LangChain v1.0+.
 """
 import sys
@@ -39,181 +38,55 @@ sys.path.insert(0, str(project_root))
 
 def test_langchain_imports():
     """Test LangChain v1.0+ imports"""
-    print("Testing LangChain v1.0+ imports...")
+    import langchain
+    import langchain_core
+    import langchain_openai
+    import langchain_community
+    import langchain_classic
     
-    try:
-        import langchain
-        version = getattr(langchain, '__version__', 'installed')
-        print(f"  ✓ langchain {version}")
-    except ImportError as e:
-        print(f"  ✗ langchain import failed: {e}")
-        return False
-    
-    try:
-        import langchain_core
-        version = getattr(langchain_core, '__version__', 'installed')
-        print(f"  ✓ langchain_core {version}")
-    except ImportError as e:
-        print(f"  ✗ langchain_core import failed: {e}")
-        return False
-    
-    try:
-        import langchain_openai
-        version = getattr(langchain_openai, '__version__', 'installed')
-        print(f"  ✓ langchain_openai {version}")
-    except ImportError as e:
-        print(f"  ✗ langchain_openai import failed: {e}")
-        return False
-    
-    try:
-        import langchain_community
-        version = getattr(langchain_community, '__version__', 'installed')
-        print(f"  ✓ langchain_community {version}")
-    except ImportError as e:
-        print(f"  ✗ langchain_community import failed: {e}")
-        return False
-    
-    try:
-        import langchain_classic
-        version = getattr(langchain_classic, '__version__', 'installed')
-        print(f"  ✓ langchain_classic {version}")
-    except ImportError as e:
-        print(f"  ✗ langchain_classic import failed: {e}")
-        return False
-    
-    return True
+    # Verify they can be imported
+    assert langchain is not None
+    assert langchain_core is not None
+    assert langchain_openai is not None
+    assert langchain_community is not None
+    assert langchain_classic is not None
 
 def test_langchain_classic_imports():
     """Test langchain-classic imports for legacy components"""
-    print("\nTesting langchain-classic imports...")
+    from langchain_classic.chains import LLMChain
+    from langchain_classic import hub
     
-    try:
-        from langchain_classic.chains import LLMChain
-        print("  ✓ langchain_classic.chains.LLMChain")
-    except ImportError as e:
-        print(f"  ✗ langchain_classic.chains.LLMChain import failed: {e}")
-        return False
-    
-    try:
-        from langchain_classic import hub
-        print("  ✓ langchain_classic.hub")
-    except ImportError as e:
-        print(f"  ✗ langchain_classic.hub import failed: {e}")
-        return False
-    
-    return True
+    assert LLMChain is not None
+    assert hub is not None
 
 def test_agent_executor_import():
     """Test AgentExecutor import (moved to langchain_classic.agents in v1.0)"""
-    print("\nTesting AgentExecutor import...")
+    from langchain_classic.agents import AgentExecutor, create_structured_chat_agent
     
-    try:
-        from langchain_classic.agents import AgentExecutor, create_structured_chat_agent
-        print("  ✓ langchain_classic.agents.AgentExecutor")
-        print("  ✓ langchain_classic.agents.create_structured_chat_agent")
-    except ImportError as e:
-        print(f"  ✗ AgentExecutor import failed: {e}")
-        # Try langchain.agents as fallback
-        try:
-            from langchain.agents import AgentExecutor, create_structured_chat_agent
-            print("  ✓ langchain.agents.AgentExecutor (fallback)")
-            print("  ✓ langchain.agents.create_structured_chat_agent (fallback)")
-        except ImportError as e2:
-            print(f"  ✗ Fallback import also failed: {e2}")
-            return False
-    
-    return True
+    assert AgentExecutor is not None
+    assert create_structured_chat_agent is not None
 
 def test_pydantic_v2():
     """Test Pydantic v2"""
-    print("\nTesting Pydantic v2...")
+    import pydantic
+    from pydantic import model_validator
     
-    try:
-        import pydantic
-        version = getattr(pydantic, '__version__', 'unknown')
-        if version != 'unknown':
-            major_version = int(version.split('.')[0])
-            if major_version >= 2:
-                print(f"  ✓ pydantic {version} (v2)")
-            else:
-                print(f"  ✗ pydantic {version} (expected v2)")
-                return False
-        else:
-            # Check if it's v2 by trying to import v2-specific features
-            try:
-                from pydantic import model_validator
-                print(f"  ✓ pydantic installed (v2)")
-            except ImportError:
-                print(f"  ✗ pydantic v2 features not available")
-                return False
-    except ImportError as e:
-        print(f"  ✗ pydantic import failed: {e}")
-        return False
+    version = getattr(pydantic, '__version__', 'unknown')
+    if version != 'unknown':
+        major_version = int(version.split('.')[0])
+        assert major_version >= 2, f"Expected Pydantic v2, got {version}"
     
-    return True
+    # Verify v2-specific features are available
+    assert model_validator is not None
 
 def test_core_imports():
     """Test core LangChain components"""
-    print("\nTesting core LangChain components...")
+    from langchain_core.language_models import BaseLanguageModel
+    from langchain_core.runnables import RunnableSequence
+    from langchain_core.output_parsers import JsonOutputParser
     
-    try:
-        from langchain_core.language_models import BaseLanguageModel
-        print("  ✓ langchain_core.language_models.BaseLanguageModel")
-    except ImportError as e:
-        print(f"  ✗ BaseLanguageModel import failed: {e}")
-        return False
-    
-    try:
-        from langchain_core.runnables import RunnableSequence
-        print("  ✓ langchain_core.runnables.RunnableSequence")
-    except ImportError as e:
-        print(f"  ✗ RunnableSequence import failed: {e}")
-        return False
-    
-    try:
-        from langchain_core.output_parsers import JsonOutputParser
-        print("  ✓ langchain_core.output_parsers.JsonOutputParser")
-    except ImportError as e:
-        print(f"  ✗ JsonOutputParser import failed: {e}")
-        return False
-    
-    return True
+    assert BaseLanguageModel is not None
+    assert RunnableSequence is not None
+    assert JsonOutputParser is not None
 
-def main():
-    """Run all dependency tests"""
-    print("=" * 60)
-    print("Component 1: Dependencies & Requirements Test")
-    print("=" * 60)
-    
-    results = []
-    
-    results.append(("LangChain v1.0+ imports", test_langchain_imports()))
-    results.append(("langchain-classic imports", test_langchain_classic_imports()))
-    results.append(("AgentExecutor import", test_agent_executor_import()))
-    results.append(("Pydantic v2", test_pydantic_v2()))
-    results.append(("Core components", test_core_imports()))
-    
-    print("\n" + "=" * 60)
-    print("Test Results Summary:")
-    print("=" * 60)
-    
-    all_passed = True
-    for test_name, passed in results:
-        status = "✓ PASS" if passed else "✗ FAIL"
-        print(f"  {status}: {test_name}")
-        if not passed:
-            all_passed = False
-    
-    print("\n" + "=" * 60)
-    if all_passed:
-        print("✓ All dependency tests passed!")
-        print("Component 1 migration verified successfully.")
-    else:
-        print("✗ Some tests failed. Please review the errors above.")
-    print("=" * 60)
-    
-    return 0 if all_passed else 1
-
-if __name__ == "__main__":
-    exit(main())
 
